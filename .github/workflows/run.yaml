@@ -44,6 +44,7 @@ jobs:
 
           echo "" >> report.md
           echo "# Confusion Matrix and Feature Importance" >> report.md
-          cml publish ConfusionMatrix.png FeatureImportance.png --md >> report.md
+          cml publish ConfusionMatrix.png --md >> report.md
+          cml publish FeatureImportance.png --md >> report.md
 
           cml comment create report.md
