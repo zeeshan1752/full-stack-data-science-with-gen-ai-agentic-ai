@@ -1,0 +1,44 @@
+name: Model Training CICD
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+on:
+  push:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up CML
+        uses: iterative/setup-cml@v1
+
+      - name: Train model and publish report
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd 10_CICD_Pipeline
+
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python train_model.py
+
+          echo "# Random Forest and Logistic Regression Model Scores" > report.md
+          cat scores.txt >> report.md
+
+          echo "" >> report.md
+          echo "# Confusion Matrix and Feature Importance" >> report.md
+          cml publish ConfusionMatrix.png FeatureImportance.png --md >> report.md
+
+          cml comment create report.md
